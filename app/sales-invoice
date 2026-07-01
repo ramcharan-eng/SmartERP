@@ -1,0 +1,25 @@
+
+model SalesInvoice {
+  id            String   @id @default(cuid())
+  invoiceNumber String
+  date          DateTime @default(now())
+  isInterState  Boolean  @default(false)
+
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  items SalesInvoiceItem[]
+
+  subtotal   Float
+  cgstTotal  Float @default(0)
+  sgstTotal  Float @default(0)
+  igstTotal  Float @default(0)
+  grandTotal Float
+
+  createdAt DateTime @default(now())
+
+  @@unique([companyId, invoiceNumber])   // ← composite uniqueness instead of plain @unique
+}
