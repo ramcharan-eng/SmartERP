@@ -1,14 +1,14 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   const sale = await prisma.salesInvoice.findUnique({
-    where: {
-      id: params.id,
-    },
+    where: { id },
     include: {
       items: true,
       customer: true,
@@ -19,24 +19,21 @@ export async function GET(
 }
 
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const body = await req.json();
 
   await prisma.salesInvoice.update({
-    where: {
-      id: params.id,
-    },
+    where: { id },
     data: {
       customerId: body.customerId,
-
       subtotal: body.subtotal,
       cgstTotal: body.cgstTotal,
       sgstTotal: body.sgstTotal,
       igstTotal: body.igstTotal,
       grandTotal: body.grandTotal,
-
       items: {
         deleteMany: {},
         create: [
@@ -62,13 +59,13 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   await prisma.salesInvoice.delete({
-    where: {
-      id: params.id,
-    },
+    where: { id },
   });
 
   return NextResponse.json({
